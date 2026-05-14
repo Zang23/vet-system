@@ -1,5 +1,9 @@
 package edu.vet.controller;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +14,30 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class VeterinarioController {
+
+    private static final String DB_JDBC_URI = "jdbc:mariadb://localhost:3307/agenda?allowPublicKeyRetrieval=true&useSSL=false";
+    private static final String DB_USER = "root";
+    private static final String DB_PASS = "alunofatec";
+
+    private Connection con;
+
+    public VeterinarioController(){
+        
+
+        try {        
+            Class.forName("org.mariadb.jdbc.Driver");
+            System.out.println("Classe carregada...");
+            con = DriverManager.getConnection(DB_JDBC_URI, DB_USER, DB_PASS);
+            System.out.println("Conexao foi feita com sucesso");
+        } catch (ClassNotFoundException e) { 
+            System.out.println("Erro ao carregar a classe");
+            e.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar");
+            e.printStackTrace();
+        }
+
+    }
     
     private StringProperty nome = new SimpleStringProperty("");
     private StringProperty especialidade = new SimpleStringProperty("");
@@ -37,8 +65,27 @@ public class VeterinarioController {
 
     public void salvar(){
 
-        lista.add(toEntity());
+
+        Veterinario vet = toEntity();
+
+         try { 
+            String sql = "INSERT INTO veterinario (nome, especialidade, crv) VALUES " +
+           "(?, ?, ?)";
+            PreparedStatement stm = con.prepareStatement(sql);
+
+            stm.setString(1, vet.getNome());
+            stm.setString(2, vet.getEspecialidade());
+            stm.setString(3, vet.getCrv());
+
+            stm.executeUpdate();
+            System.out.println("Comando executado com sucesso");   
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar");
+            e.printStackTrace();
+        }
+
         System.out.println("Vet salvo com sucesso");
+
     }
 
     public void pesquisarPorNome(){

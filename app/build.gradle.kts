@@ -21,6 +21,7 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.4.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
